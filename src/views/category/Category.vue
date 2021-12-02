@@ -53,14 +53,16 @@
         currentIndex: -1
       }
     },
+    mounted() {
+      //监听商品加载完成,刷新scroll
+      this.$bus.$on('itemImageLoad',()=>{
+        this.$refs.scroll.refresh()
+      })
+    },
     created() {
 		  // 1.请求分类数据
       this._getCategory()
 
-      // 2.监听图片加载完成
-	    this.$bus.$on('imgLoad', () => {
-		    this.$refs.scroll.refresh()
-	    })
     },
     computed: {
 		  showSubcategory() {

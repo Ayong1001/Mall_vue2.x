@@ -83,10 +83,10 @@
 
     },
     mounted() {
-      /*//监听商品加载完成,刷新scroll
+      //监听商品加载完成,刷新scroll
       this.$bus.$on('itemImageLoad',()=>{
         this.$refs.scroll.refresh()
-      })*/
+      })
       //创建完便手动点击一次
       this.tabClick(0)
 
@@ -142,7 +142,7 @@
         getHomeGoods(type, page).then(res => {
           this.goods[type].list.push(...res.data.list)
           this.goods[type].page += 1
-          // this.$refs.scroll.finishPullUp()
+          this.$refs.scroll.finishPullUp()
         })
       }
     }
