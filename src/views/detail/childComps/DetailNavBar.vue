@@ -28,6 +28,8 @@ export default {
   methods:{
     itemClick(index){
       this.currentIndex=index
+      //发出点击事件
+      this.$emit('itemClick',index)
     },
     imgClick(){
       this.$router.go(-1)

@@ -9,8 +9,7 @@
             ref="scroll"
             :probe-type="3"
             @scroll="contentScroll"
-            :pull-up-load="true"
-            @pullingUp="loadMore">
+            :pull-up-load="true" @pullingUp="loadMore">
       <home-swiper :banners="banners" @swiperImgLoad="swiperImgLoad"/>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
@@ -37,6 +36,7 @@
   import BackTop from 'components/content/backTop/BackTop'
 
   import { getHomeMultidata, getHomeGoods } from "network/home"
+  import {itemListenerMixin,backTopMixin} from "@/common/mixin";
 
   export default {
     name: "Home",
@@ -50,7 +50,7 @@
       Scroll,
       BackTop
     },
-
+    mixins:[itemListenerMixin,backTopMixin],
     data() {
       return {
         banners: [],
@@ -61,10 +61,9 @@
           'sell': {page: 0, list: []},
         },
         currentType: 'pop',
-        isShowBackTop: false,
         tabOffsetTop:0,
         isTabControlFixed:false,
-        saveY:0
+        saveY:0,
       }
     },
     computed: {
@@ -84,37 +83,29 @@
 
     },
     mounted() {
-      //创建完便手动点击一次
-      this.tabClick(0)
-      //监听item组件商品加载完成
+      /*//监听商品加载完成,刷新scroll
       this.$bus.$on('itemImageLoad',()=>{
         this.$refs.scroll.refresh()
-      })
+      })*/
+      //创建完便手动点击一次
+      this.tabClick(0)
+
     },
     activated() {
-      this.$refs.scroll.scrollTo(0, this.saveY,0)
       this.$refs.scroll.refresh()
+      this.$refs.scroll.scrollTo(0, this.saveY,0)
     },
     deactivated() {
       this.saveY=this.$refs.scroll.getScrollY()
+      //取消全局事件的监听
+      this.$bus.$off('itemImageLoad',this.itemImgListener)
     },
     destroyed() {
-      console.log('home被销毁')
     },
     methods: {
       /**
        * 事件监听相关的方法
        */
-      //防抖控制
-      debounce(func,delay){
-        let timer=null
-
-        return function (){
-        	  if(timer){
-        	   clearTimeout(timer)
-        	  }
-        }
-      },
 
       tabClick(index) {
         this.currentType=['pop','new','sell'][index]
@@ -126,7 +117,7 @@
       },
       contentScroll(position) {
         //决定什么时候显示 回到顶部图标(BackTop)
-        this.isShowBackTop = (-position.y) > 1000
+        this.listenShowBackTop(position)
         this.isTabControlFixed=(-position.y)>this.tabOffsetTop
       },
       loadMore() {
@@ -151,7 +142,7 @@
         getHomeGoods(type, page).then(res => {
           this.goods[type].list.push(...res.data.list)
           this.goods[type].page += 1
-          this.$refs.scroll.finishPullUp()
+          // this.$refs.scroll.finishPullUp()
         })
       }
     }
@@ -178,12 +169,8 @@
 
   .content {
     overflow: hidden;
-
-    position: absolute;
-    top: 44px;
-    bottom: 49px;
-    left: 0;
-    right: 0;
+    height: calc(100% - 44px - 49px);
+    background-color: #fff;
   }
 
   .tab-control{

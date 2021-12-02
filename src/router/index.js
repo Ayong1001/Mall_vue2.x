@@ -14,7 +14,7 @@ Vue.use(VueRouter)
 // 2.创建router
 const routes = [
   {
-    path: '',
+    path: '/',
     redirect: '/home'
   },
   {
@@ -42,6 +42,5 @@ const router = new VueRouter({
   routes,
   mode: 'history'
 })
-
 
 export default router
